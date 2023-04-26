@@ -1,5 +1,6 @@
 use std::{fmt, io};
 
+#[derive(Debug)]
 pub enum RLiteError {
     Io(io::Error),
     MetaCommmandError(String),
@@ -15,6 +16,8 @@ impl fmt::Display for RLiteError {
         }
     }
 }
+
+pub type RLiteResult<T> = std::result::Result<T, RLiteError>;
 
 impl From<io::Error> for RLiteError {
     fn from(err: io::Error) -> RLiteError {

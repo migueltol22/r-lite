@@ -1,23 +1,33 @@
 use std::{
     io::{self, BufRead, Write},
-    process,
 };
 
-use r_lite::error::RLiteError;
+use r_lite::error::{RLiteError, RLiteResult};
 
-enum RLiteCommands {
-    MetaCommand,
-    Statement,
+struct Scanner{}
+
+impl Scanner {
+    fn new() -> Self {
+        Self{}
+    }
+
+    fn scan(&self, source: &str) -> Result<Vec<Token>, RLiteError> {
+        todo!()
+    }
 }
 
-enum StatementType {
+#[derive(Debug)]
+struct Token{
+    _type: TokenType,
+}
+
+#[derive(Debug)]
+enum TokenType {
+    MetaExit,
     StatementInsert,
-    StatementSelect,
+    StatementSelect
 }
 
-struct Statement {
-    _type: StatementType,
-}
 
 fn strip_trailing_newline(input: &str) -> &str {
     input
@@ -26,44 +36,21 @@ fn strip_trailing_newline(input: &str) -> &str {
         .unwrap_or(input)
 }
 
-fn process_meta_command(source: &str) -> Result<(), RLiteError> {
-    match source {
-        ".exit" => process::exit(0),
-        _ => RLiteError::MetaCommmandError("Unrecognized command {source}".to_string()),
-    };
-    Ok(())
-}
-
-fn process_statement(source: &str) -> Result<Statement, RLiteError> {
-    match source {
-        "insert" => Ok(Statement {
-            _type: StatementType::StatementInsert,
-        }),
-        "select" => Ok(Statement {
-            _type: StatementType::StatementSelect,
-        }),
-        _ => Err(RLiteError::StatementError(
-            "Unrecognized keyword at start of {source}".to_string(),
-        )),
+fn process(source: &str) -> Result<(), RLiteError> {
+    let scanner = Scanner::new();
+    let tokens = scanner.scan(source)?;
+    for token in tokens {
+        println!("{:?}", token);
     }
-}
-
-fn execute_statement(statement: Statement) -> Result<(), RLiteError> {
-    todo!()
+    Ok(())
 }
 
 fn run(source: &str) -> Result<(), RLiteError> {
-    match source.chars().nth(0) {
-        Some('.') => process_meta_command(source)?,
-        _ => {
-            let statement = process_statement(source)?;
-            execute_statement(statement)?;
-        }
-    }
+    let tokens = process(source)?;
     Ok(())
 }
 
-fn run_prompt() {
+fn run_prompt() -> Result<(), RLiteError>{
     let stdin = io::stdin();
     let mut handler = stdin.lock();
 
@@ -72,7 +59,7 @@ fn run_prompt() {
         io::stdout().flush().unwrap();
         let mut line = String::new();
         if handler.read_line(&mut line).is_err() || line.is_empty() {
-            return;
+            break;
         }
 
         match run(strip_trailing_newline(&line)) {
@@ -80,8 +67,10 @@ fn run_prompt() {
             Err(e) => println!("{}", e),
         };
     }
+    Ok(())
 }
 
-fn main() {
-    run_prompt();
+fn main() -> RLiteResult<()>{
+    run_prompt()?;
+    Ok(())
 }
