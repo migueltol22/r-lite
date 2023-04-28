@@ -10,17 +10,12 @@ fn strip_trailing_newline(input: &str) -> &str {
         .unwrap_or(input)
 }
 
-fn process(source: &str) -> Result<(), RLiteError> {
+fn run(source: &str) -> Result<(), RLiteError> {
     let mut scanner = Scanner::new(source);
     let tokens = scanner.scan()?;
     for token in tokens {
         println!("{:?}", token);
     }
-    Ok(())
-}
-
-fn run(source: &str) -> Result<(), RLiteError> {
-    let tokens = process(source)?;
     Ok(())
 }
 
