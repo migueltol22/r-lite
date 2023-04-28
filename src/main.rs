@@ -1,33 +1,7 @@
-use std::{
-    io::{self, BufRead, Write},
-};
+use std::io::{self, BufRead, Write};
 
 use r_lite::error::{RLiteError, RLiteResult};
-
-struct Scanner{}
-
-impl Scanner {
-    fn new() -> Self {
-        Self{}
-    }
-
-    fn scan(&self, source: &str) -> Result<Vec<Token>, RLiteError> {
-        todo!()
-    }
-}
-
-#[derive(Debug)]
-struct Token{
-    _type: TokenType,
-}
-
-#[derive(Debug)]
-enum TokenType {
-    MetaExit,
-    StatementInsert,
-    StatementSelect
-}
-
+use r_lite::scanner::Scanner;
 
 fn strip_trailing_newline(input: &str) -> &str {
     input
@@ -37,8 +11,8 @@ fn strip_trailing_newline(input: &str) -> &str {
 }
 
 fn process(source: &str) -> Result<(), RLiteError> {
-    let scanner = Scanner::new();
-    let tokens = scanner.scan(source)?;
+    let mut scanner = Scanner::new(source);
+    let tokens = scanner.scan()?;
     for token in tokens {
         println!("{:?}", token);
     }
@@ -50,7 +24,7 @@ fn run(source: &str) -> Result<(), RLiteError> {
     Ok(())
 }
 
-fn run_prompt() -> Result<(), RLiteError>{
+fn run_prompt() -> Result<(), RLiteError> {
     let stdin = io::stdin();
     let mut handler = stdin.lock();
 
@@ -70,7 +44,7 @@ fn run_prompt() -> Result<(), RLiteError>{
     Ok(())
 }
 
-fn main() -> RLiteResult<()>{
+fn main() -> RLiteResult<()> {
     run_prompt()?;
     Ok(())
 }
